@@ -5,7 +5,8 @@ require 'pathname'
 
 PREFIX = 'root-'
 TIME_ZONE = Time.now.strftime("%z")
-SNAPSHOT_DIRECTORY = "/snapshot/system"
+SNAPSHOT_DIRECTORY = ARGV[0]
+SNAPSHOT_PATTERN = ARGV[1]
 
 def add_hours(t, hours)
   ret = t + hours * 60 * 60
@@ -97,8 +98,13 @@ archives = ss_dir.children
                  .sort {|x, y| y <=> x }
 
 for archive in archives
-  timestamp = archive.basename.to_s[PREFIX.length..-1]
-  time = DateTime.strptime(timestamp + TIME_ZONE, '%Y-%m-%d-%H%M%S%z').to_time
+  # Parse the timestamp
+  time = begin
+    DateTime.strptime(archive.basename.to_s + TIME_ZONE, SNAPSHOT_PATTERN + '%z')
+  rescue ArgumentError
+    next
+  end.to_time
+
   allocated = false
   periods.each do |(s, e), found|
     if found.length == 0 && s <= time && time < e
