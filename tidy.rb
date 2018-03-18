@@ -3,7 +3,10 @@
 require 'date'
 require 'pathname'
 
-USAGE = "usage: #{$PROGRAM_NAME} <snapshot-directory> <snapshot-pattern>"
+USAGE = "usage: #{$PROGRAM_NAME} <snapshot-directory> <snapshot-pattern>
+
+For example:
+  #{$PROGRAM_NAME} /snapshot/system 'root-%Y-%m-%d-%H%M%S'"
 PREFIX = 'root-'
 TIME_ZONE = Time.now.strftime("%z")
 SNAPSHOT_DIRECTORY = ARGV[0]
