@@ -7,7 +7,6 @@ USAGE = "usage: #{$PROGRAM_NAME} <snapshot-directory> <snapshot-pattern>
 
 For example:
   #{$PROGRAM_NAME} /snapshot/system 'root-%Y-%m-%d-%H%M%S'"
-PREFIX = 'root-'
 TIME_ZONE = Time.now.strftime("%z")
 SNAPSHOT_DIRECTORY = ARGV[0]
 SNAPSHOT_PATTERN = ARGV[1]
@@ -101,9 +100,7 @@ end
 end
 
 ss_dir = Pathname::new(SNAPSHOT_DIRECTORY)
-archives = ss_dir.children
-                 .select {|path| path.basename.to_s.start_with?(PREFIX) }
-                 .sort {|x, y| y <=> x }
+archives = ss_dir.children.sort {|x, y| y <=> x }
 
 for archive in archives
   # Parse the timestamp
