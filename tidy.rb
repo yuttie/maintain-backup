@@ -3,10 +3,15 @@
 require 'date'
 require 'pathname'
 
+USAGE = "usage: #{$PROGRAM_NAME} <snapshot-directory> <snapshot-pattern>"
 PREFIX = 'root-'
 TIME_ZONE = Time.now.strftime("%z")
 SNAPSHOT_DIRECTORY = ARGV[0]
 SNAPSHOT_PATTERN = ARGV[1]
+
+if SNAPSHOT_PATTERN.nil? || SNAPSHOT_PATTERN.nil?
+  abort(USAGE)
+end
 
 def add_hours(t, hours)
   ret = t + hours * 60 * 60
