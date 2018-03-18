@@ -102,6 +102,8 @@ end
 ss_dir = Pathname::new(SNAPSHOT_DIRECTORY)
 archives = ss_dir.children.sort {|x, y| y <=> x }
 
+keep = []
+delete = []
 for archive in archives
   # Parse the timestamp
   time = begin
@@ -114,11 +116,21 @@ for archive in archives
   periods.each do |(s, e), found|
     if found.length == 0 && s <= time && time < e
       found << archive
+      keep << archive
       allocated = true
       break
     end
   end
   unless allocated
-    puts(archive)
+    delete << archive
   end
 end
+
+keep.each do |archive|
+  puts("\033[1;32m" + '✔️ ' + "\033[0m" + archive.to_s)
+end
+
+delete.each do |archive|
+  puts("\033[1;31m" + '✘ ' + "\033[0m" + archive.to_s)
+end
+
