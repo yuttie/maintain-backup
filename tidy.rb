@@ -134,4 +134,4 @@ delete.each do |archive|
   puts("\033[1;31m" + '✘ ' + "\033[0m" + archive.to_s)
 end
 
-puts("#{keep.length} packages will be kept, and #{delete.length} packages will be deleted.")
+puts("#{keep.length} snapshots will be kept, and #{delete.length} snapshots will be deleted.")
