@@ -1,18 +1,26 @@
 #!/usr/bin/ruby
 
 require 'date'
+require 'optparse'
 require 'pathname'
 
-USAGE = "usage: #{$PROGRAM_NAME} <snapshot-directory> <snapshot-pattern>
-
-For example:
-  #{$PROGRAM_NAME} /snapshot/system 'root-%Y-%m-%d-%H%M%S'"
 TIME_ZONE = Time.now.strftime("%z")
+
+optp = OptionParser.new
+optp.banner = "Usage: #{$PROGRAM_NAME} <snapshot-directory> <snapshot-pattern>"
+optp.on('-n', '--dry-run') {|v| v }
+optp.on('--help') {|v| v }
+
+opts = {}
+optp.parse!(ARGV, into: opts)
 SNAPSHOT_DIRECTORY = ARGV[0]
 SNAPSHOT_PATTERN = ARGV[1]
 
-if SNAPSHOT_PATTERN.nil? || SNAPSHOT_PATTERN.nil?
-  abort(USAGE)
+if opts[:help] || SNAPSHOT_PATTERN.nil? || SNAPSHOT_PATTERN.nil?
+  puts("#{optp}
+Example:
+    #{$PROGRAM_NAME} /snapshot/system 'root-%Y-%m-%d-%H%M%S'")
+  exit
 end
 
 def add_hours(t, hours)
@@ -126,12 +134,18 @@ for archive in archives
   end
 end
 
-keep.each do |archive|
-  puts("\033[1;32m" + '✔️ ' + "\033[0m" + archive.to_s)
-end
+if opts[:"dry-run"]
+  keep.each do |archive|
+    puts("\033[1;32m" + '✔️ ' + "\033[0m" + archive.to_s)
+  end
 
-delete.each do |archive|
-  puts("\033[1;31m" + '✘ ' + "\033[0m" + archive.to_s)
-end
+  delete.each do |archive|
+    puts("\033[1;31m" + '✘ ' + "\033[0m" + archive.to_s)
+  end
 
-puts("#{keep.length} snapshots will be kept, and #{delete.length} snapshots will be deleted.")
+  puts("#{keep.length} snapshots will be kept, and #{delete.length} snapshots will be deleted.")
+else
+  delete.each do |archive|
+    puts(archive.to_s)
+  end
+end
