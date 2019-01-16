@@ -7,19 +7,18 @@ require 'pathname'
 TIME_ZONE = Time.now.strftime("%z")
 
 optp = OptionParser.new
-optp.banner = "Usage: #{$PROGRAM_NAME} <snapshot-directory> <snapshot-pattern>"
+optp.banner = "Usage: #{$PROGRAM_NAME} <snapshot-pattern>"
 optp.on('-n', '--dry-run') {|v| v }
 optp.on('--help') {|v| v }
 
 opts = {}
 optp.parse!(ARGV, into: opts)
-SNAPSHOT_DIRECTORY = ARGV[0]
-SNAPSHOT_PATTERN = ARGV[1]
+SNAPSHOT_PATTERN = ARGV[0]
 
-if opts[:help] || SNAPSHOT_PATTERN.nil? || SNAPSHOT_PATTERN.nil?
+if opts[:help] || SNAPSHOT_PATTERN.nil?
   puts("#{optp}
 Example:
-    #{$PROGRAM_NAME} /snapshot/system 'root-%Y-%m-%d-%H%M%S'")
+    #{$PROGRAM_NAME} 'data/home@%Y-%m-%d-%H%M%S'")
   exit
 end
 
@@ -107,15 +106,14 @@ end
   ]
 end
 
-ss_dir = Pathname::new(SNAPSHOT_DIRECTORY)
-archives = ss_dir.children.sort {|x, y| y <=> x }
+archives = STDIN.each.map {|line| line.chomp }.to_a.sort {|x, y| y <=> x }
 
 keep = []
 delete = []
 for archive in archives
   # Parse the timestamp
   time = begin
-    DateTime.strptime(archive.basename.to_s + TIME_ZONE, SNAPSHOT_PATTERN + '%z')
+    DateTime.strptime(archive + TIME_ZONE, SNAPSHOT_PATTERN + '%z')
   rescue ArgumentError
     next
   end.to_time
